@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Disease Prediction System</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.symptoms {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.symptoms label {
+    background: #f1f3f6;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.symptoms input {
+    margin-right: 10px;
+}
+
+.symptoms label:hover {
+    background: #dfe6ff;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #5a67d8;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #e6fffa;
+    text-align: center;
+    font-size: 18px;
+    display: none;
+}
+
+.loader {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Disease Prediction System</h1>
+
+    <form id="form">
+
+        <div class="symptoms">
+            <label><input type="checkbox" value="fever"> Fever</label>
+            <label><input type="checkbox" value="cough"> Cough</label>
+            <label><input type="checkbox" value="headache"> Headache</label>
+            <label><input type="checkbox" value="fatigue"> Fatigue</label>
+            <label><input type="checkbox" value="vomiting"> Vomiting</label>
+            <label><input type="checkbox" value="chills"> Chills</label>
+        </div>
+
+        <button type="submit">Predict Disease</button>
+    </form>
+
+    <div class="loader" id="loader"> Predicting...</div>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+document.getElementById("form").onsubmit = async function(e) {
+    e.preventDefault();
+
+    let loader = document.getElementById("loader");
+    let resultBox = document.getElementById("result");
+
+    loader.style.display = "block";
+    resultBox.style.display = "none";
+
+    let checkboxes = document.querySelectorAll("input[type=checkbox]");
+    let data = {};
+
+    checkboxes.forEach(cb => {
+        data[cb.value] = cb.checked ? 1 : 0;
+    });
+
+    let res = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    let result = await res.json();
+
+    loader.style.display = "none";
+    resultBox.style.display = "block";
+
+    resultBox.innerHTML = `✅ Predicted Disease: <b>${result.prediction}</b>`;
+};
+</script>
+
+</body>
+</html>
